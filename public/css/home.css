@@ -1,0 +1,344 @@
+body{
+    height:89%;
+    background-color:white ;
+    padding:0;
+    margin:0 !important;
+}
+header{
+    height:70px;
+    background-color: #003366 ;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Make the container take up at least the full height */
+}
+
+main {
+    flex: 1; /* Allow the main content to grow and fill space */
+}
+
+footer {
+    /* Optional styles for footer */
+    background-color: #003366 ; /* Example background color */
+    padding: 10px; /* Example padding */
+    text-align: center; /* Center the text */
+    height:40px;
+}
+
+.body table{
+    height:60vh;
+    width:80%;
+    margin-left:10%;
+    margin-right:10%;
+    margin-top: 7%;
+    position: absolute;
+    border-top:2px solid black;
+    border-bottom: 2px solid black;
+    text-align: center;
+    align-items: center;
+}
+.body table td:nth-child(1) {
+    width:3%;/* Red text color for the third cell in each row */
+    margin-top:3%;
+  }
+  .body table td:nth-child(2) {
+    width:15%;/* Red text color for the third cell in each row */
+    margin-top:3%;
+  }
+.body .title1{
+    font-size:92px;
+    font-family: "Satisfy", cursive;
+    font-weight: 400;
+    font-style: normal;
+    text-align: center;
+    
+    margin-top:-5%;
+}
+.logo{
+    border-radius: 75%;
+    border:2px black solid;
+    width:40vh;
+    height:40vh;
+    margin-top:-8%;
+}
+.introduction{
+    border-left:2px solid black;
+    border-right: 2px solid black;
+    text-align: justify;
+    padding: 5 5 5 5;
+    font-size:22px;
+}
+.introduction h1{
+    font-size:48px;
+    align-items: center;
+    text-align: center;
+}
+.introduction .container1{
+    width:90%; 
+    margin-left:5%;
+
+}
+.introduction p:nth-of-type(2),.introduction span {
+    font-style: italic; 
+
+}
+.introduction p:nth-of-type(2) ,
+.introduction p:nth-of-type(3),
+.introduction  span {
+    text-align: center;
+}
+.introduction span{
+    text-decoration: underline; 
+    color:blue;
+}
+footer p{
+    color:white
+}
+
+/******************************** Sign Up Container  ****************************************/
+.popup1 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content1 {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.close1 {
+    cursor: pointer;
+    float: right;
+    font-size: 24px;
+}
+
+form {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 400px;
+    margin: auto;
+}
+
+fieldset {
+    border: none;
+}
+
+legend {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.legend-part, .legend-subtext {
+    cursor: pointer;
+    padding: 10px;
+    transition: color 0.3s;
+}
+
+.legend-part.active, .legend-subtext.active {
+    font-weight: bold;
+    color: #007bff; /* Active color */
+}
+
+
+
+input[type="text"], input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.button2,.button3 {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    width: 100%;
+    transition: background-color 0.3s;
+    flex: 1; /* Make buttons take equal space */
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button2:hover {
+    background-color: #0056b3;
+}
+
+.form .separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 10px 0;
+    width:100%;
+  }
+  
+  .form .separator::before,
+  .form .separator::after {
+    content: "";
+    flex: 1;
+    border-bottom: 2px solid #ccc;
+    margin: 0 10px;
+  }
+  
+  .form .separator span {
+    white-space: nowrap;
+    color: #666;
+    font-size: 18px;
+  }
+
+/* Popup Styles */
+.popup-container2 {
+    position: absolute;
+    z-index: 1000;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+}
+
+.popup-content2 {
+    position: relative;
+}
+
+.close-button2 {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 1.5em;
+}
+
+.g_id_signin {
+    margin-top: 20px;
+    text-align: center;
+}
+  /* Style for the popup container */
+  .popup-container2 {
+    position: absolute;
+    top: 50%; /* Adjust positioning as needed */
+    left: 265px; /* Position the popup to the left of the input */
+    transform: translateY(-50%);
+    width: 200px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    z-index: 1000;
+  }
+  
+  /* Style for the popup arrow */
+  .popup-arrow2 {
+    position: absolute;
+    top: 10px;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #fff;
+  }
+  
+  /* Style for close button */
+  .close-button2 {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+  }
+  /* Style for the OTP container, label, and input on one line */
+  .otp-container {
+    display: flex; /* Use flexbox to align label and input horizontally */
+    align-items: center; /* Vertically align */
+  }
+  
+  .otp-label {
+    display: inline-block;
+    margin-right: 5px; /* Space between label and input */
+    font-size: 14px; /* Adjust font size if needed */
+    width:15px;
+  }
+  
+  .popup-container2 input{
+    width:34% !important;
+  }
+  .popup-container2 button{
+    font-size:14px;
+  
+  }
+.formbutton {
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    gap: 10px; /* Space between buttons */
+}
+.button2:hover {
+    background-color: #0056b3;
+}
+
+.button3:hover {
+    background-color: #218838;
+}
+.input-container {
+    margin-bottom: 15px;
+    position:relative;
+}
+.validation-popup1::before, .validation-popup2::before{
+    border-width: 10px; /* Increased border width for a larger arrow */
+    border-style: solid;
+    border-color: transparent #f8d7da transparent transparent; /* Arrow color */
+    content: '';
+    position: absolute;
+}
+.validation-popup1::before {
+    top: 15px; /* Adjust for larger arrow */
+    left: -20px; /* Adjust for larger arrow */
+}
+.validation-popup2::before {
+    top: 11px; /* Adjust for larger arrow */
+    left: -20px; /* Adjust for larger arrow */
+}
+.validation-popup1 , .validation-popup2{
+    background-color: #f8d7da;
+    color: #0c0b0b;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px;
+    z-index: 10;
+    margin-top: 5px; /* Space between input and popup */
+    width: 200px; /* Width of the popup */
+    font-size: 0.9em; /* Font size */
+    position: absolute;
+}
+.validation-popup1 {
+    top: -5%; /* Position below the input */
+    left: 103%;
+}
+.validation-popup2 {
+    top: -20%; /* Position below the input */
+    left: 103%;
+}
