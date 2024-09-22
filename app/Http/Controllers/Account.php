@@ -17,22 +17,28 @@ class Account extends Controller
                 'username' => 'required|string|unique:users,username',
                 'password' => 'required|string',
                 'usertype' => 'required|string',
+                'g_id' => 'string',
             ]);
-    
+        
             if ($validator->fails()) {
                 return response()->json([
                     'errors' => $validator->errors()
                 ], 422); // Unprocessable Entity
             }
-    
+        
+            // Set id to null if usertype is 'phone', otherwise use the provided id
+            $id = $request->usertype === 'phone' ? null : $request->id;
+        
             $user = User::create([
+                'id' => $id, // Set id to null or the provided value
                 'username' => $request->username,
                 'password' => Hash::make($request->password),
                 'usertype' => $request->usertype,
+                'g_id' => $request->g_id, // Include g_id if provided
             ]);
-    
+        
             return response()->json(['message' => 'User registered successfully!'], 201);
-    
+        
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Username was already taken',
@@ -44,6 +50,7 @@ class Account extends Controller
                 'error' => $e->getMessage(),
             ], 500); // Internal Server Error
         }
+        
     }
     
     public function login(Request $request)

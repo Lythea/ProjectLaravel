@@ -106,7 +106,7 @@ function registerFunction(event) {
         return response.json();
     })
     .then(data => {
-        alert('Login Successfully', data);
+        alert('Registered Successfully', data);
     })
     .catch((error) => {
         alert('Error: ' + error.message);
@@ -141,6 +141,36 @@ function loginFunction(event) {
         } else {
             console.error('Login failed:', data.message);
         }
+    })
+    .catch(error => console.error('Error:', error));
+}
+function onGoogleSignIn(googleUser) {
+    const idToken = googleUser.getAuthResponse().id_token;
+
+    // Send the ID token to your backend for verification
+    fetch("{{ url('/auth/google/callback') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': '{{ csrf_token() }}' // Include CSRF token
+        },
+        body: JSON.stringify({ idToken })
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Handle the error response
+            return response.json().then(data => {
+                if (data.error) {
+                    // Display the alert if username exists
+                    alert(data.error);
+                }
+            });
+        }
+        // Handle successful login
+        return response.json().then(data => {
+            // Redirect or handle success here
+            console.log(data);
+        });
     })
     .catch(error => console.error('Error:', error));
 }

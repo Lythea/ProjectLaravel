@@ -35,7 +35,7 @@
                     <p>From banner ads to interactive content, we’ve got you covered.<br> Let AdSpace elevate your advertising game...</p>
                     <br><br>
                     <p style="text-align:center;">Don't have an account yet? <span id="popupTrigger1">SignUp/Login Here!</span></p>
-                    
+             
                 </div>
             </div>
             </td>
@@ -77,23 +77,23 @@
             <span>or</span>
           </div>
       
-          <!-- Google Sign-In button   -->
+          <a  href="http://localhost:8000/auth/google/redirect">
           <div id="g_id_onload"
-            data-client_id="788567745600-1hv1jnm2qa7hk9s4i40v7cegt33pqejq.apps.googleusercontent.com"
-            data-context="signin"
-            data-ux_mode="popup"
-            data-callback="http://localhost:8000"
-            data-itp_support="true">
-        </div>
+     data-client_id="799357008732-84t77501ss52u32o7q18uilm4lrjehih.apps.googleusercontent.com"
+     data-context="use"
+     data-ux_mode="redirect"
+     data-login_uri="http://localhost:8000/auth/google/redirect"
+     data-itp_support="true">
+</div>
 
-        <div class="g_id_signin"
-            data-type="standard"
-            data-shape="rectangular"
-            data-theme="outline"
-            data-text="signin_with"
-            data-size="large"
-            data-logo_alignment="left">
-        </div>
+<div class="g_id_signin"
+     data-type="standard"
+     data-shape="rectangular"
+     data-theme="outline"
+     data-text="signin_with"
+     data-size="large"
+     data-logo_alignment="left">
+</div></a>
         </fieldset>
       </form>
       
