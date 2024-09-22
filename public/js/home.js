@@ -1,5 +1,6 @@
 let username = '';
 let usertype = '';
+let password = '';
 let verify_name;
 let verify_type;
 document.addEventListener("DOMContentLoaded", function() {
@@ -48,6 +49,7 @@ function validateContact() {
             enablebutton();
         }
         document.getElementById('register').disabled = false; // Enable register button
+        document.getElementById('login').disabled = false; 
     }
     console.log(usertype + phoneRegex.test(value) + ' ' + value + emailRegex.test(value) + ' ' + value);
 }
@@ -67,23 +69,23 @@ function validatePassword() {
         passwordValidation.textContent = 'Weak password: Must include an upper, lower, number, symbol, and be at least 8 characters.';
         passwordValidation.style.display = 'block';
         document.getElementById('register').disabled = true; 
+        document.getElementById('login').disabled = true; 
     } else {
         passwordValidation.style.display = 'none';
         console.log(value + true);
         verify_name= true;
+        password = value;
         enablebutton();
     }
 }
 function enablebutton(){
     if (verify_name ==true && verify_type==true){
-        document.getElementById('register').disabled = false; 
+        document.getElementById('register').disabled = false;
+        document.getElementById('login').disabled = false;  
     }
 }
 function registerFunction(event) {
-    event.preventDefault(); // Prevent form submission
-    validateContact();
-    validatePassword();
-    console.log("Register function called");
+    event.preventDefault();
     fetch('http://localhost:8000/api/register', {
         method: 'POST',
         headers: {
@@ -92,6 +94,7 @@ function registerFunction(event) {
         body: JSON.stringify({
             username: username,
             usertype: usertype,
+            password: password,
         }),
     })
     .then(response => {
@@ -103,10 +106,41 @@ function registerFunction(event) {
         return response.json();
     })
     .then(data => {
-        console.log('Success:', data);
+        alert('Login Successfully', data);
     })
     .catch((error) => {
-        alert('Error: The username was already taken.');
+        alert('Error: ' + error.message);
     });
 }
 
+function loginFunction(event) {
+    event.preventDefault();
+    fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+        }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                throw new Error(errorData.message);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.token) {
+            localStorage.setItem('api_token', data.token);
+            console.log('Login successful');
+            window.location.href = '/dashboard';
+        } else {
+            console.error('Login failed:', data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}

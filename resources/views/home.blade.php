@@ -67,9 +67,9 @@
 
           
           <div class="formbutton">
-          <button type="submit" class="button2" id="register" onclick="registerFunction(event)" disabled>REGISTER</button>
+          <button type="button" class="button2" id="register" onclick="registerFunction(event)" disabled>REGISTER</button>
 
-          <button type="submit" class="button3" id="register" onclick="registerFunction(event)" disabled>LOGIN</button>
+          <button type="button" class="button3" id="login" onclick="loginFunction(event)" disabled>LOGIN</button>
       
           </div>
        
