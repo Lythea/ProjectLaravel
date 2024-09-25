@@ -1,0 +1,87 @@
+body {
+    height: 89%;
+    background-color: white;
+    position:fixed;
+    width:100%;
+}
+header,h1 {
+    height: 5vh;
+    background-color: #003366;
+    padding: 0;
+    margin: 0 !important;
+}
+main table {
+    width: 100%;
+    height: 95vh;
+}
+main table td:nth-child(1) {
+    width: 12%;
+    border-right: 2px solid black;
+}
+main table td:nth-child(2) {
+    width: 100%;
+    border: 1px solid #000;
+    height: 95vh; /* Keep the height consistent */
+}
+.content-section {
+    padding: 20px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+}
+.category {
+    cursor: pointer;
+    padding: 5px;
+    border: 1px solid #ccc;
+    margin: 2px 0;
+}
+.category:hover {
+    background-color: #f0f0f0; /* Change background on hover */
+}
+.app-box {
+    width: 100px;
+    height: 100px;
+    background-color: #ccc;
+    display: inline-block;
+    margin-right: 10px;
+}
+.hidden {
+    display: none; /* Hide sections by default */
+}
+.content-section-games {
+    padding: 20px;
+    background-color: #f9f9f9;
+    margin: 10px;
+    height: 80%;
+    width: 100%;
+}
+
+.game-box {
+    display: inline-block;
+    margin: 10px;
+    text-align: center;
+    font-size: 24px;
+}
+
+.game-box img {
+    width: 240px; /* Set width to 25% of the parent container */
+    height: 240px; /* Maintain aspect ratio */
+    transition: transform 0.3s ease; /* Optional: for a scaling effect on hover */
+}
+
+.game-box img:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
+.content-area {
+    height: 95vh; /* Set the height of the content area */
+
+}
+
+.scrollablecontent {
+    height: calc(107vh - 100px); /* Adjust height as needed (subtract header height) */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #ccc; /* Optional: add a border for visibility */
+}
+a {
+    text-decoration: none; /* Removes the underline */
+    color: inherit; /* Inherits the font color from its parent element */
+}

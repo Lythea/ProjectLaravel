@@ -6,12 +6,31 @@ use Illuminate\Http\Request; // Import the Request class
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
-Route::get('/dashboard', function () {
-    return view('dashboard');
-});
+
 Route::get('/', function () {
     return view('home');
 });
+Route::get('/dashboard', function () {
+    return view('dashboard');
+});
+Route::get('/nightcrow', function () {
+    return view('nightcrow');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Route::get('/auth/google/redirect', function (Request $request) {
     return Socialite::driver("google")->redirect();
 });
