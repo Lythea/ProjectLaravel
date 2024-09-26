@@ -23,4 +23,19 @@ class AppServiceProvider extends ServiceProvider
         //
     }
     
+public function map()
+{
+    // Ensure that api routes are mapped
+    $this->mapApiRoutes();
+
+    // Other route mappings...
+}
+
+protected function mapApiRoutes()
+{
+    Route::prefix('api')
+         ->middleware('api')
+         ->namespace($this->namespace)
+         ->group(base_path('routes/api.php'));
+}
 }

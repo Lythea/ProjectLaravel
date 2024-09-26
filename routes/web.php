@@ -13,8 +13,11 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 });
-Route::get('/nightcrow', function () {
-    return view('nightcrow');
+Route::get('/nightcrows', function () {
+    return view('nightcrows');
+});
+Route::get('/toram', function () {
+    return view('toram');
 });
 
 

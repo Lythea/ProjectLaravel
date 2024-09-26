@@ -16,7 +16,7 @@ document.querySelectorAll('.category').forEach(item => {
     });
 });
 const games = [
-    { name: "NightCrows", imgSrc: "assets/NC.webp", url: "http://127.0.0.1:8000/nightcrow" },
+    { name: "NightCrows", imgSrc: "assets/NC.webp", url: "http://127.0.0.1:8000/nightcrows" },
     { name: "Valorant", imgSrc: "assets/Valorant.webp", url: "https://example.com/valorant" },
     { name: "Dota 2", imgSrc: "assets/Dota2.jpg", url: "https://example.com/dota2" },
     { name: "League of Legends", imgSrc:"assets/LoL.png", url: "https://example.com/leagueoflegends" },

@@ -23,7 +23,12 @@ class User extends Authenticatable
         'password',
         'usertype',
         'g_id',
-        'email_verified_at'
+        'email_verified_at',
+
+        'cave_name',
+        'location',
+        'start_time',
+        'end_time',
     ];
 
     /**

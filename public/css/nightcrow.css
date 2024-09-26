@@ -23,7 +23,7 @@ th {
     color: white;
 }
 button {
-    padding: 10px 15px;
+    padding: 8px 12px;
     border: none;
     background-color: #4CAF50;
     color: white;
@@ -39,4 +39,67 @@ button:hover {
     font-size: 24px;
     margin: 20px;
     color: #ff0000; /* Red color for emphasis */
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 30%; /* Full width */
+    height: 100%; /* Full height */
+    margin-left:35%;
+}
+
+.cute-modal {
+    background-color: #fff; /* White background */
+    margin: 10% auto; /* 10% from the top and centered */
+    padding: 20px;
+    border: 2px solid #ff69b4; /* Hot pink border */
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.5); /* Soft shadow */
+    width: 80%; /* Could be more or less, depending on screen size */
+    text-align: center; /* Center text */
+    animation: fadeIn 0.3s; /* Fade-in animation */
+}
+
+.close {
+    color: #ff69b4; /* Hot pink close button */
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #ff1493; /* Darker pink on hover */
+}
+
+.cute-button {
+    background-color: #ff69b4; /* Hot pink button */
+    color: white; /* White text */
+    border: none; /* No border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 10px 20px; /* Padding */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s; /* Transition effect */
+}
+p{
+    font-size:22px;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+ /* Container for the radio buttons using flexbox */
+ .radio-container {
+    display: flex; /* Use flexbox for layout */
+    gap: 20px; /* Space between radio buttons */
+    align-items: center; /* Center align vertically */
+}
+
+.remote-radio {
+    cursor: pointer; /* Change cursor on hover */
 }

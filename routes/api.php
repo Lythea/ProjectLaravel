@@ -3,7 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Account;
-
+use App\Http\Controllers\Games;
+use App\Http\Middleware\CorsMiddleware;
 use App\Http\Middleware\Token;
 
 Route::get('/user', function (Request $request) {
@@ -13,10 +14,12 @@ Route::get('/user', function (Request $request) {
 Route::post('/register', [Account::class, 'register']);
 Route::post('/login', [Account::class, 'login'])->name('login')->middleware('throttle:5,1');
 
+Route::get('/retrieve-countdown', [Games::class, 'retrieve']);
 
+Route::middleware([CorsMiddleware::class])->group(function () {
+    Route::post('/store-countdown', [Games::class, 'store']);
+});
 
-
-// Authenticated routes
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
