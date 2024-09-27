@@ -1,10 +1,10 @@
 const caves = [
-    { id: 1, name: "Cave 1", location: "Tigdal", respawnTimeHours: 11, respawnTimeMinutes: 50 },
+    { id: 1, name: "Cave 1", location: "Tigdal", respawnTimeHours: 0, respawnTimeMinutes: 2 },
     { id: 2, name: "Cave 2", location: "Gatphillian", respawnTimeHours: 11, respawnTimeMinutes: 50 },
     { id: 3, name: "Cave 3", location: "Modi", respawnTimeHours: 11, respawnTimeMinutes: 50 },
     { id: 4, name: "Cave 3", location: "Hotura", respawnTimeHours: 11, respawnTimeMinutes: 50 },
-    { id: 5, name: "Cave 4", location: "Panderre", respawnTimeHours: 11, respawnTimeMinutes: 50 },
-    { id: 6, name: "Cave 4", location: "Stormid", respawnTimeHours: 11, respawnTimeMinutes: 50 },
+    { id: 5, name: "Cave 4", location: "Panderre", respawnTimeHours: 15, respawnTimeMinutes: 50 },
+    { id: 6, name: "Cave 4", location: "Stormid", respawnTimeHours: 15, respawnTimeMinutes: 50 },
     { id: 7, name: "Cave 5", location: "Maltanis", respawnTimeHours: 15, respawnTimeMinutes: 50 },
     { id: 8, name: "Cave 6", location: "Dardaloca", respawnTimeHours: 15, respawnTimeMinutes: 50 },
     { id: 9, name: "Battlefront", location: "KoD", respawnTimeHours: 23, respawnTimeMinutes: 50 },
@@ -14,15 +14,23 @@ const caves = [
 const tbody = document.getElementById('caves-body');
 const emergencyCountdownDisplay = document.getElementById('countdown-display');
 let countdownIntervals = {}; // Store countdown intervals for each cave
-let isAlarmActive = false; // Global variable to track alarm status
+const alarmIntervals = {};
+const earlySignalIntervals = {}; // To store early signal intervals for each cave
+let clickCount = {
+    option1: 0,
+    option2: 0,
+};
 
+
+let isAlarmActive = false; // Global variable to track alarm status
+const countdownData = [];
 // Initialize caves table
 caves.forEach(cave => {
     const row = document.createElement('tr');
     row.innerHTML = `
         <td>${cave.name}</td>
         <td>${cave.location}</td>
-        <td id="countdown_${cave.id}">Not Set</td>
+        <td id="countdown_${cave.id}">Not Set<br>${cave.endTime}</td>
         <td>
             <button onclick="setCountdown(${cave.id}, '${cave.name}', '${cave.location}', ${cave.respawnTimeHours}, ${cave.respawnTimeMinutes})">
                 Set ${cave.respawnTimeHours}h ${cave.respawnTimeMinutes}m Countdown
@@ -31,10 +39,93 @@ caves.forEach(cave => {
     `;
     tbody.appendChild(row);
 });
+// Function to handle radio button click
+function handleRadioClick(radio) {
+    const id = radio.id;
+    
+    // Increment click count for the selected radio
+    clickCount[id]++;
+    
+    // Update display for the number of clicks
+    const clickDisplay = document.getElementById(`click-count-${id}`);
+    clickDisplay.innerText = `${clickCount[id]}`;
+}
+function setEmergencyCountdownFromDropdown() {
+    const emergencyHours = parseInt(document.getElementById('emergency-hours').value) || 0;
+    const emergencyMinutes = parseInt(document.getElementById('emergency-minutes').value) || 0;
 
-// Function to set the countdown based on the respawn time
+    // Calculate total emergency time in seconds
+    let totalEmergencyTime = (emergencyHours * 3600) + (emergencyMinutes * 60);
+
+    // Get selected cave from the dropdown
+    const caveSelect = document.getElementById('cave-select');
+    const selectedCaveId = parseInt(caveSelect.value);
+    
+    const selectedCave = caves.find(cave => cave.id === selectedCaveId);
+    
+    if (!selectedCave) {
+        console.error("No cave selected or invalid cave ID.");
+        return;
+    }
+
+    // Clear existing intervals if they exist
+    clearInterval(countdownIntervals[selectedCave.id]);
+
+    const countdownElement = document.getElementById(`countdown_${selectedCave.id}`);
+    countdownElement.innerText = "Not Set";
+
+    const startTime = new Date();
+    const endTime = new Date(startTime.getTime() + totalEmergencyTime * 1000);
+
+    // Adjust end time based on total click counts
+    const totalDeductionMinutes = (clickCount.option1 * 5) + (clickCount.option2 * 10);
+    endTime.setMinutes(endTime.getMinutes() - totalDeductionMinutes);
+
+    const formattedStartTime = formatDateToPH(startTime);
+    const formattedEndTime = formatDateToPH(endTime);
+
+    const countdownEntry = {
+        caveId: selectedCave.id,
+        caveName: selectedCave.name,
+        caveLocation: selectedCave.location,
+        totalRespawnTime: totalEmergencyTime,
+        startTime: formattedStartTime,
+        endTime: formattedEndTime
+    };
+
+    const existingIndex = countdownData.findIndex(data => data.caveId === selectedCave.id);
+
+    if (existingIndex !== -1) {
+        countdownData[existingIndex] = countdownEntry;
+    } else {
+        countdownData.push(countdownEntry);
+    }
+
+    console.log(countdownData);
+
+    countdownElement.innerHTML = `${formatCountdownTime(totalEmergencyTime)}`;
+    
+    countdownIntervals[selectedCave.id] = setInterval(() => {
+        const currentTime = new Date();
+        let remainingTime = Math.floor((endTime - currentTime) / 1000);
+        countdownElement.innerHTML = `${formatCountdownTime(remainingTime)}`;
+
+        if (currentTime >= endTime) {
+            clearInterval(countdownIntervals[selectedCave.id]);
+            countdownElement.innerHTML = "Countdown Finished";
+            playAlarm(selectedCave.name, selectedCave.location);
+        } else if (remainingTime <= 180 && remainingTime > 0) {
+            if (remainingTime % 60 === 0) {
+                playShortAlarm(selectedCave.name, selectedCave.location);
+            }
+        }
+    }, 1000);
+}
+
+
+
 function setCountdown(caveId, caveName, caveLocation, respawnTimeHours, respawnTimeMinutes) {
-    // Clear existing countdown interval if it exists
+    // Clear existing countdown intervals if they exist
     clearInterval(countdownIntervals[caveId]);
 
     // Get the countdown element for the specific cave
@@ -43,90 +134,73 @@ function setCountdown(caveId, caveName, caveLocation, respawnTimeHours, respawnT
 
     // Calculate total respawn time in seconds
     let totalRespawnTime = (respawnTimeHours * 3600) + (respawnTimeMinutes * 60);
-
-    // Start the countdown
-    updateCountdownDisplay(caveId, totalRespawnTime);
     
-    // Set a new interval for the countdown
+    // Get current time for startTime
+    const startTime = new Date();
+    
+    // Calculate endTime by adding total respawn time
+    const endTime = new Date(startTime.getTime() + totalRespawnTime * 1000);
+
+    // Format the start and end time using the specified function
+    const formattedStartTime = formatDateToPH(startTime);
+    const formattedEndTime = formatDateToPH(endTime);
+
+    // Log the countdown data
+    const countdownEntry = {
+        caveId: caveId,
+        caveName: caveName,
+        caveLocation: caveLocation,
+        totalRespawnTime: totalRespawnTime,
+        startTime: formattedStartTime,
+        endTime: formattedEndTime
+    };
+
+    // Find the index of the existing entry
+    const existingIndex = countdownData.findIndex(data => data.caveId === caveId);
+    
+    if (existingIndex !== -1) {
+        // Update existing entry if found
+        countdownData[existingIndex] = countdownEntry; // Replace existing entry
+    } else {
+        // Add new entry if it doesn't exist
+        countdownData.push(countdownEntry);
+    }
+
+    // Log the updated countdown data array
+    console.log(countdownData);
+
+    // Initialize countdown display
+    countdownElement.innerHTML = `${formatCountdownTime(totalRespawnTime)}`;
+
+    // Set an interval for the countdown display
     countdownIntervals[caveId] = setInterval(() => {
-        totalRespawnTime--;
+        const currentTime = new Date(); // Get current time every second
+        let remainingTime = Math.floor((endTime - currentTime) / 1000); // Update remaining time
 
-        // Update the countdown display
-        updateCountdownDisplay(caveId, totalRespawnTime);
+        // Update the countdown display with remaining time
+        countdownElement.innerHTML = `${formatCountdownTime(remainingTime)}`;
 
-        // If countdown reaches zero, stop the countdown and play alarm sound
-        if (totalRespawnTime <= 0) {
-            clearInterval(countdownIntervals[caveId]);
-            countdownElement.innerText = "Countdown Finished!";
-            playAlarm(caveName, caveLocation); // Pass cave name and location
+        // If remaining time reaches zero, stop the countdown and upd   ate display text
+        if (currentTime >= endTime) {
+            clearInterval(countdownIntervals[caveId]); // Stop the countdown display interval
+            countdownElement.innerHTML = `${formatCountdownTime(0)}<br> End Time: ${formattedEndTime}<br>Countdown Finished!`;
+
+            playAlarm(caveName, caveLocation); // Pass cave name and location based on endTime
+        } else if (remainingTime <= 180 && remainingTime > 0) {
+            if (remainingTime % 60 === 0) {
+                playShortAlarm(caveName, caveLocation);
+            }
         }
     }, 1000);
 }
-function setEmergencyCountdownFromDropdown() {
-    const caveSelect = document.getElementById('cave-select');
-    const selectedCaveId = caveSelect.value;
-    const emergencyHours = parseInt(document.getElementById('emergency-hours').value) || 0;
-    const emergencyMinutesInput = document.getElementById('emergency-minutes');
-    let emergencyMinutes = parseInt(emergencyMinutesInput.value) || 0;
+// Fetch countdowns when the document is fully loaded
+document.addEventListener("DOMContentLoaded", function() {
+    fetchCountdowns(); // Fetch the countdowns from the backend
+});
 
-    // Validate if a cave is selected
-    if (!selectedCaveId) {
-        alert("Please select a cave.");
-        return;
-    }
-
-    // Reset the countdown for the selected cave
-    clearInterval(countdownIntervals[selectedCaveId]);
-    const countdownElement = document.getElementById(`countdown_${selectedCaveId}`);
-    countdownElement.innerText = "Not Set"; // Reset display
-
-    // Get the cave details
-    const selectedCave = caves.find(cave => cave.id == selectedCaveId);
-    const caveName = selectedCave.name; // Get the name of the cave
-    const caveLocation = selectedCave.location; // Get the location of the cave
-
-    // Get selected radio button value
-    const options = document.getElementsByName("options");
-    let deduction = 0;
-
-    for (const option of options) {
-        if (option.checked) {
-            deduction = parseInt(option.value); // -5 or -10
-            break; // Exit the loop once the checked option is found
-        }
-    }
-
-    // Deduct the selected radio button value from the total emergency minutes
-    const totalEmergencyTimeInMinutes = emergencyHours * 60 + emergencyMinutes; // Convert total time to minutes
-    const finalEmergencyTimeInMinutes = totalEmergencyTimeInMinutes - deduction;
-
-    // Ensure the result is not negative
-    const adjustedEmergencyMinutes = finalEmergencyTimeInMinutes < 0 ? 0 : finalEmergencyTimeInMinutes;
-
-    // Convert adjusted emergency time to seconds for countdown
-    let totalEmergencyTime = adjustedEmergencyMinutes * 60;
-
-    // Start the emergency countdown
-    updateCountdownDisplay(selectedCaveId, totalEmergencyTime);
-    
-    // Set a new interval for emergency countdown
-    countdownIntervals[selectedCaveId] = setInterval(() => {
-        totalEmergencyTime--;
-
-        // Update the countdown display
-        updateCountdownDisplay(selectedCaveId, totalEmergencyTime);
-
-        // If countdown reaches zero, stop the countdown and play alarm sound
-        if (totalEmergencyTime <= 0) {
-            clearInterval(countdownIntervals[selectedCaveId]);
-            countdownElement.innerText = "Emergency Countdown Finished!";
-            playAlarm(caveName, caveLocation); // Pass the cave name and location
-        }
-    }, 1000);
-}
-
+// Existing fetchCountdowns function remains unchanged
 function fetchCountdowns() {
-    fetch('/api/retrieve-countdown') // Change this to your actual endpoint
+    fetch('/api/retrieve-countdown')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to fetch countdowns.');
@@ -136,33 +210,7 @@ function fetchCountdowns() {
         .then(data => {
             if (data.success && Array.isArray(data.data)) {
                 data.data.forEach(countdown => {
-                    const caveId = countdown.id; // Use the unique ID
-                    const remainingSeconds = calculateRemainingTime(countdown.start_time, countdown.end_time);
-                    
-                    // Format start and end time for display
-                    const formattedStartTime = (countdown.start_time);
-                    const formattedEndTime = (countdown.end_time);
-        
-                    // Update display with formatted dates
-                    const countdownElement = document.getElementById(`countdown_${caveId}`);
-                    if (countdownElement) { // Ensure the element exists
-                        countdownElement.innerHTML = `Cave: ${countdown.cave_name} <br> 
-                                                       Location: ${countdown.location} <br> 
-                                                       Starts at: ${formattedStartTime} <br> 
-                                                       Ends at: ${formattedEndTime}`;
-        
-                        if (remainingSeconds > 0) {
-                            // Format the countdown display
-                            const formattedTime = formatCountdownTime(remainingSeconds);
-                            countdownElement.innerHTML += `<br> Time Remaining: ${formattedTime}`;
-                            startCountdown(caveId, remainingSeconds, countdown.cave_name, countdown.location);
-                        } else {
-                            // If the countdown is finished
-                            countdownElement.innerHTML += "<br> Countdown Finished!";
-                        }
-                    } else {
-                        console.error(`Element for cave ${caveId} not found.`);
-                    }
+                    setupCountdown(countdown); // Setup countdown for each
                 });
             } else {
                 console.error('Invalid data format received from the server.');
@@ -171,10 +219,48 @@ function fetchCountdowns() {
         .catch(error => {
             console.error('Error fetching countdowns:', error);
         });
+}
+
+// Setup countdown for the specific cave
+function setupCountdown(countdown) {
+    const caveId = countdown.id; // Use the unique ID
+    const caveName = countdown.cave_name;
+    const caveLocation = countdown.location;
+
+    const endTime = new Date(countdown.end_time);
+    const currentTime = new Date();
+
+    // Calculate the remaining time
+    let remainingTime = Math.floor((endTime - currentTime) / 1000);
+    const formattedEndTime = formatDateToPH(endTime);
+
+    const countdownElement = document.getElementById(`countdown_${caveId}`);
+    clearInterval(countdownIntervals[caveId]); // Clear existing intervals
+
+    // Initialize countdown display for active countdown
+    countdownElement.innerHTML = `${formatCountdownTime(remainingTime)}`;
+
+    countdownIntervals[caveId] = setInterval(() => {
+        const currentTime = new Date();
+        remainingTime = Math.floor((endTime - currentTime) / 1000);
         
-        
-        // Function to calculate remaining time in seconds
-    }
+        // Update the countdown display with remaining time
+        countdownElement.innerHTML = `${formatCountdownTime(remainingTime)}`;
+
+        // Check for negative remaining time
+        if (currentTime >= endTime) {
+            clearInterval(countdownIntervals[caveId]); // Stop the countdown display interval
+            countdownElement.innerHTML = `${formatCountdownTime(0)}<br> End Time: ${formattedEndTime}<br>Countdown Finished!`;
+            playAlarm(caveName, caveLocation); // Pass cave name and location based on endTime
+        } else if (remainingTime <= 180 && remainingTime > 0) {
+            if (remainingTime % 60 === 0) {
+                playShortAlarm(caveName, caveLocation);
+            }
+        }   
+    }, 1000);
+}
+
+
 // Function to calculate remaining time in seconds
 function calculateRemainingTime(startTime, endTime) {
     const startDate = new Date(startTime); // ISO format works directly
@@ -191,33 +277,51 @@ function calculateRemainingTime(startTime, endTime) {
     
         return `${hours}h ${minutes}m ${seconds}s`; // Construct the formatted string with 's' for seconds
     }
-function startCountdown(caveId, totalTime, caveName, caveLocation) {
-    // Clear existing countdown interval if it exists
-    clearInterval(countdownIntervals[caveId]);
 
-    // Start the countdown
-    updateCountdownDisplay(caveId, totalTime);
-    
-    // Set a new interval for the countdown
-    countdownIntervals[caveId] = setInterval(() => {
-        totalTime--;
-
-        // Update the countdown display
-        updateCountdownDisplay(caveId, totalTime);
-
-        // If countdown reaches zero, stop the countdown and play alarm sound
-        if (totalTime <= 0) {
-            clearInterval(countdownIntervals[caveId]);
-            const countdownElement = document.getElementById(`countdown_${caveId}`);
-            countdownElement.innerText = "Countdown Finished!";
-            playAlarm(caveName, caveLocation); // Pass cave name and location
-        }
-    }, 1000);
-}
 
 window.onload = function() {
     fetchCountdowns(); // Fetch countdowns from the backend on page load
 };
+function formatTime(remainingTime, endTime) {
+    // Calculate the current date
+    const currentDate = new Date();
+
+    // Calculate the end date
+    const endDate = new Date(endTime);
+
+    // Check if the end date is the next day
+    const isNextDay = endDate.getDate() !== currentDate.getDate();
+
+    if (isNextDay) {
+        // Format to AM/PM if the end time is on the next day
+        const options = {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+            timeZone: 'Asia/Singapore', // Ensure the time is in PH time (SG time)
+        };
+
+        // Format the end time with AM/PM
+        return endDate.toLocaleString('en-SG', options).replace(',', '');
+    } else {
+        // Format the time to include the date if it's the same day
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+            timeZone: 'Asia/Singapore', // Ensure the time is in PH time (SG time)
+        };
+
+        // Format the date and time
+        return new Date(endTime).toLocaleString('en-SG', options).replace(',', '');
+    }
+}
+
 function formatDateToPH(date) {
     const options = {
         year: 'numeric',
@@ -233,42 +337,35 @@ function formatDateToPH(date) {
     return new Date(date).toLocaleString('en-SG', options).replace(',', '');
 }
 function storeCountdown() {
-    const countdownData = [];
-
-    // Loop through each cave to get its countdown data
-    caves.forEach(cave => {
-        const countdownElement = document.getElementById(`countdown_${cave.id}`);
+    // Prepare to collect the countdown data from the existing array
+    const countdownDataToStore = countdownData.filter(data => {
+        // Check if the countdown is set and not finished
+        const countdownElement = document.getElementById(`countdown_${data.caveId}`);
         const remainingTime = countdownElement.innerText;
 
-        // Check if the countdown is set
-        if (remainingTime !== "Not Set" && !remainingTime.includes("Finished")) {
-            const totalTimeParts = remainingTime.split(' ');
-            const hours = parseInt(totalTimeParts[0]) || 0;
-            const minutes = parseInt(totalTimeParts[2]) || 0;
-            const seconds = parseInt(totalTimeParts[4]) || 0;
+        return remainingTime !== "Not Set" && !remainingTime.includes("Finished");
+    }).map(data => {
+        // Get the current time in Philippine time
+        const startTime = formatDateToPH(new Date()); // Get the current time formatted to PH time
+        
+        // Calculate the end time based on the total respawn time
+        const totalRemainingSeconds = data.totalRespawnTime; // Use existing totalRespawnTime
+        const endTimeUTC = new Date(new Date().getTime() + (totalRemainingSeconds * 1000)); // Add remaining seconds to current time
+        const endTime = formatDateToPH(endTimeUTC); // Format end time to PH time
 
-            // Calculate total remaining seconds
-            const totalRemainingSeconds = (hours * 3600) + (minutes * 60) + seconds;
-
-            // Get the current time in Philippine time
-            const startTime = formatDateToPH(new Date()); // Get the current time formatted to PH time
-            
-            // Calculate end time based on remaining seconds
-            const endTimeUTC = new Date(new Date().getTime() + (totalRemainingSeconds * 1000)); // Add remaining seconds to current time
-            const endTime = formatDateToPH(endTimeUTC); // Format end time to PH time
-
-            // Prepare data to send
-            countdownData.push({
-                cave: cave.name,
-                location: cave.location,
-                start_time: startTime, // Use formatted PH time
-                end_time: endTime // Use formatted end time in PH time
-            });
-
-            console.log('Start Time (PH):', startTime); // Log the start time in PH
-            console.log('End Time (PH):', endTime); // Log the end time in PH
-        }
+        return {
+            cave: data.caveName,
+            location: data.caveLocation,
+            start_time: startTime, // Use formatted PH time
+            end_time: endTime // Use formatted end time in PH time
+        };
     });
+
+    if (countdownDataToStore.length === 0) {
+        alert('No active countdowns to store.');
+        return;
+    }
+
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     // Send the countdown data to the backend
@@ -278,7 +375,7 @@ function storeCountdown() {
             'Content-Type': 'application/json',
             // 'X-CSRF-TOKEN': csrfToken // Uncomment if CSRF token is needed
         },
-        body: JSON.stringify(countdownData),
+        body: JSON.stringify(countdownDataToStore),
     })
     .then(response => {
         // Check if response is OK (status 200-299)
@@ -301,6 +398,7 @@ function storeCountdown() {
         alert('An error occurred while storing countdowns: ' + error.message);
     });
 }
+
 // Function to update the countdown display
 function updateCountdownDisplay(caveId, totalTime) {
     const countdownElement = document.getElementById(`countdown_${caveId}`);
@@ -310,7 +408,24 @@ function updateCountdownDisplay(caveId, totalTime) {
 
     countdownElement.innerText = `${hours}h ${minutes}m ${seconds}s`;
 }
+function playShortAlarm(caveName, caveLocation) {
+    const alarmSound = document.getElementById('alarm-sound'); // Get the audio element
+    if (alarmSound) {
+        if (!isAlarmActive) { // Only play if not already active
+            alarmSound.loop = false; // Play only once
+            alarmSound.currentTime = 0; // Reset sound to start
+            alarmSound.play(); // Play the short alarm sound for a few seconds
+            isAlarmActive = true; // Set alarm active for a short period
 
+            setTimeout(() => {
+                alarmSound.pause(); // Stop the short signal after a few seconds
+                isAlarmActive = false; // Reset alarm active status
+            }, 3000); // Play alarm for 3 seconds
+        }
+    } else {
+        console.error('Alarm sound element not found');
+    }
+}
 // Function to play the alarm sound and show modal notification
 function playAlarm(caveName, caveLocation) {
     const alarmSound = document.getElementById('alarm-sound'); // Get the audio element
@@ -346,12 +461,53 @@ function closeModal() {
     alarmSound.pause(); // Pause the sound
     alarmSound.currentTime = 0; // Reset sound to start
 }
-const radios = document.getElementsByName('options');
-
-// Add event listener to each radio button
+const radios = document.querySelectorAll('input[name="options"]');
 radios.forEach(radio => {
-    radio.addEventListener('change', function() {
-        const selectedOption = this.value; // Get the selected radio button value
-      
-    });
+    radio.addEventListener('click', () => handleRadioClick(radio));
 });
+function verify() {
+    const loadingContainer = document.getElementById('loadingContainer');
+    const loadingBar = document.getElementById('loadingBar');
+    const verificationMessage = document.getElementById('verificationMessage');
+    const verifyButton = document.getElementById('verifyButton');
+
+    // Show loading container
+    loadingContainer.style.display = 'block';
+
+    // Reset loading bar width
+    loadingBar.style.width = '0';
+
+    // Disable the button during the loading process
+    verifyButton.disabled = true;
+    verifyButton.innerText = 'Verifying...'; // Change button text during verification
+
+    // Start loading animation
+    let width = 0;
+    const interval = setInterval(() => {
+        if (width >= 100) {
+            clearInterval(interval);
+        } else {
+            width++;
+            loadingBar.style.width = width + '%';
+        }
+    }, 10); // Adjust this value for the speed of the loading
+
+    // After 1 second, show the complete message and reset the UI
+    setTimeout(() => {
+        clearInterval(interval);
+        loadingBar.style.width = '100%'; // Ensure it's filled at the end
+
+        // Update button text to "Verifying complete"
+        verifyButton.innerText = 'Verifying complete';
+        
+        // Hide the loading container
+        loadingContainer.style.display = 'none';
+
+        // Display the verification message
+        verificationMessage.innerText = 'Verification complete';
+
+        // Re-enable the button and allow further action if needed
+        verifyButton.disabled = false;
+
+    }, 1000); // Adjust this value based on your actual loading time
+}

@@ -7,9 +7,9 @@ body {
     height: 100vh;
     background-color: #f0f0f0;
 }
-table {
+.table2 table {
     border-collapse: collapse;
-    width: 80%;
+    width: 150vh;
     background-color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -93,13 +93,118 @@ p{
     from { opacity: 0; }
     to { opacity: 1; }
 }
- /* Container for the radio buttons using flexbox */
- .radio-container {
-    display: flex; /* Use flexbox for layout */
-    gap: 20px; /* Space between radio buttons */
-    align-items: center; /* Center align vertically */
+.remote-radio {
+    display: inline-flex; /* Align items inline */
+    align-items: center; /* Center align items */
+    margin-right: 15px; /* Spacing between radio buttons */
 }
 
-.remote-radio {
+.remote-radio input[type="radio"] {
+    appearance: none; /* Remove default styling */
+    width: 15px; /* Width of the radio button */
+    height: 15px; /* Height of the radio button */
+    border-radius: 50%; /* Make the button circular */
+    border: 3px solid black; /* Border color */
+    outline: none; /* Remove outline */
     cursor: pointer; /* Change cursor on hover */
+    background: transparent; /* Background color when unchecked */
+    position: relative; /* Positioning for inner circle */
+}
+
+.remote-radio input[type="radio"]:checked {
+    background-color: #007bff; /* Background color when checked */
+}
+
+.remote-radio input[type="radio"]:checked::after {
+    content: ''; /* Create inner circle */
+    width: 100%; /* Make the inner circle fill the outer circle */
+    height: 100%; /* Same as height of outer circle */
+    border-radius: 50%; /* Make it circular */
+    background: blue; /* Color of the inner circle */
+    position: absolute; /* Position it inside */
+    top: 0; /* Align to top */
+    left: 0; /* Align to left */
+}
+
+/* Optional: Add hover effect */
+.remote-radio input[type="radio"]:hover {
+    border-color: #0056b3; /* Darker border on hover */
+}
+
+/* Style for the click counts */
+.remote-radio span {
+    margin-left: 5px; /* Space between the radio button and click count */
+}
+
+.form-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap if necessary */
+    align-items: center; /* Center items vertically */
+    gap: 10px; /* Space between elements */
+    
+}
+
+.form-container label {
+    margin-right: 5px; /* Space between label and input */
+}
+
+
+.form-container button {
+    margin: 0 5px; /* Horizontal spacing */
+    padding: 5px; /* Padding for better touch targets */
+
+}
+.form-container select{
+    width:8%;
+}
+.form-container input{
+    width:2%;
+}
+.table1 table{
+    padding:0;
+    margin:0;
+}
+.table1 table td{
+   width:20%;
+   height:10%;
+}
+
+.table1 select{
+    width:80%;
+}
+.loading {
+ 
+    align-items: center;
+    margin-left:14.5%;
+}
+
+.verifyButton {
+    margin-top: 2%;
+    width: 15%;
+    margin-bottom: 5px;
+    margin-left:33.5%;
+}
+
+#loadingContainer {
+    width: 250px;               /* Set the desired width for the loading bar */
+    border: 1px solid #ccc;
+    height: 20px;
+    position: relative;       /* Space between button and loading bar */
+    margin-left:30%;
+    display: none; 
+    
+}
+#verificationMessage{
+text-align: center;
+margin-left:35.5%;
+}
+#loadingBar {
+
+    width: 0; height: 20px; background-color: green;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background-color: green;
+    width: 0;                   /* Initial width for animation */
 }
