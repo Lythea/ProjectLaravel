@@ -43,7 +43,7 @@ class Games extends Controller
 
             // Use updateOrCreate to avoid duplicates
             $countdownRecord = Countdown::updateOrCreate(
-                ['cave_name' => $countdown['cave']], // Find by cave_name
+                ['cave_name' => $countdown['cave'], 'location' => $countdown['location']],
                 [
                     'start_time' => $startTimeFormatted,
                     'end_time' => $endTimeFormatted,
